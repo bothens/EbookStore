@@ -23,17 +23,31 @@ namespace EBookStore.Controllers
         [HttpPost]
         public async Task<ActionResult<Author>> CreateAuthor(AuthorDto authorDto)
         {
-            var author = _mapper.Map<Author>(authorDto);
-            _context.Authors.Add(author);
-            await _context.SaveChangesAsync();
-            return Ok(author);
+            try
+            {
+                var author = _mapper.Map<Author>(authorDto);
+                _context.Authors.Add(author);
+                await _context.SaveChangesAsync();
+                return Ok(author);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpGet]
         public async Task<ActionResult<List<Author>>> GetAllAuthors()
         {
-            var authors = await _context.Authors.ToListAsync();
-            return authors;
+            try
+            {
+                var authors = await _context.Authors.ToListAsync();
+                return Ok(authors);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
 }

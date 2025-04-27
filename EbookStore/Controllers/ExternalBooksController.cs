@@ -1,6 +1,5 @@
-﻿using EBookStore.DTOs;
+﻿using Microsoft.AspNetCore.Mvc;
 using EBookStore.Services;
-using Microsoft.AspNetCore.Mvc;
 
 namespace EBookStore.Controllers
 {
@@ -16,9 +15,22 @@ namespace EBookStore.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<ExternalBookDto>>> Search([FromQuery] string query)
+        public async Task<IActionResult> GetExternalBooks([FromQuery] string query = null)
         {
-            return await _externalBookService.SearchBooks(query);
+            try
+            {
+                if (string.IsNullOrEmpty(query))
+                {
+                    return BadRequest("Please provide a search query");
+                }
+
+                var books = await _externalBookService.SearchBooksAsync(query);
+                return Ok(books);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
 }
