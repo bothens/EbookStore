@@ -8,14 +8,12 @@ namespace EBookStore.Mappings
     {
         public MappingProfile()
         {
-
-            CreateMap<Book, BookDto>();
-     CreateMap<BookDto, Book>()
+            CreateMap<BookDto, Book>();
+            CreateMap<AuthorDto, Author>();
+        }
+    
  
-                .ForMember(dest => dest.AuthorId, opt => opt.MapFrom(src => src.AuthorId))
-                .ForMember(dest => dest.BookId, opt => opt.Ignore());
-            CreateMap<Author, AuthorDto>(); // <-- Denna saknades
+                
             
         }
     }
-}
