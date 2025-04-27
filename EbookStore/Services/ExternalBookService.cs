@@ -12,9 +12,15 @@ namespace EBookStore.Services
             _httpClient = httpClient;
         }
 
-        public async Task<List<ExternalBookDto>> SearchBooks(string searchTerm)
+        public async Task<List<ExternalBookDto>> SearchBooksAsync(string searchTerm)
         {
             var response = await _httpClient.GetAsync($"https://www.googleapis.com/books/v1/volumes?q={searchTerm}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception($"Failed to fetch books: {response.StatusCode}");
+            }
+
             var json = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<GoogleBooksResponse>(json);
 

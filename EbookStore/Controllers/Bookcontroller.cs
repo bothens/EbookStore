@@ -1,11 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using EBookStore.Data;
 using EBookStore.Models;
-using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using EBookStore.DTOs;
+using EBookStore.Validators;
 using AutoMapper;
-using EBookStore.Controllers;
 
 namespace EBookStore.Controllers
 {
@@ -16,27 +15,48 @@ namespace EBookStore.Controllers
         private readonly IMapper _mapper;
         private readonly AppDbContext _context;
 
-        public BooksController(AppDbContext context, IMapper mapper)  // Uppdatera konstruktorn
+        public BooksController(AppDbContext context, IMapper mapper)
         {
             _context = context;
-            _mapper = mapper;  // Tilldela mapper
+            _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<Book>>> GetAll()
         {
-            // Enkel lösning med await och ToListAsync()
-            var books = await _context.Books.ToListAsync();
-            return books;
+            try
+            {
+                var books = await _context.Books.ToListAsync();
+                return Ok(books);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpPost]
-        public async Task<ActionResult<Book>> Create(Book book)
+        public async Task<ActionResult<Book>> Create(BookDto bookDto)
         {
-            _context.Books.Add(book);
-            await _context.SaveChangesAsync();
-            return Ok(book);
-        }
+            try
+            {
+                var validator = new BookDtoValidator();
+                var validationResult = await validator.ValidateAsync(bookDto);
 
+                if (!validationResult.IsValid)
+                {
+                    return BadRequest(validationResult.Errors);
+                }
+
+                var book = _mapper.Map<Book>(bookDto);
+                _context.Books.Add(book);
+                await _context.SaveChangesAsync();
+                return Ok(book);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }
