@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using EBookStore.DTOs;
+using EBookStore.Models;
 
 namespace EBookStore.Services
 {
@@ -22,36 +23,22 @@ namespace EBookStore.Services
             }
 
             var json = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<GoogleBooksResponse>(json);
+            var result = JsonSerializer.Deserialize<GoogleBooksResponse>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
 
-            return result?.Items?.Select(book => new ExternalBookDto
+            if (result?.Items == null)
+            {
+                return new List<ExternalBookDto>();
+            }
+
+            return result.Items.Select(book => new ExternalBookDto
             {
                 Title = book.VolumeInfo?.Title ?? "Ingen titel",
                 Author = book.VolumeInfo?.Authors?.FirstOrDefault() ?? "Okänd",
                 CoverUrl = book.VolumeInfo?.ImageLinks?.Thumbnail
-            }).ToList() ?? new List<ExternalBookDto>();
-        }
-
-        private class GoogleBooksResponse
-        {
-            public List<GoogleBook> Items { get; set; }
-        }
-
-        private class GoogleBook
-        {
-            public VolumeInfo VolumeInfo { get; set; }
-        }
-
-        private class VolumeInfo
-        {
-            public string Title { get; set; }
-            public List<string> Authors { get; set; }
-            public ImageLinks ImageLinks { get; set; }
-        }
-
-        private class ImageLinks
-        {
-            public string Thumbnail { get; set; }
+            }).ToList();
         }
     }
 }
