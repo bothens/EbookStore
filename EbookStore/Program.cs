@@ -6,6 +6,10 @@ using EBookStore.Mappings;
 using EBookStore.Validators;
 using FluentValidation.AspNetCore;
 using Microsoft.OpenApi.Models;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using EBookStore.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,10 +29,28 @@ builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IAuthorService, AuthorService>();
 builder.Services.AddHttpClient<ExternalBookService>();
 
+// JWT Settings
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
+var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+var key = Encoding.UTF8.GetBytes(jwtSettings.Key);
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtSettings.Issuer,
+            ValidateAudience = true,
+            ValidAudience = jwtSettings.Audience,
+            ValidateLifetime = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuerSigningKey = true
+        };
+    });
 
 // Swagger
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -39,11 +61,9 @@ builder.Services.AddSwaggerGen(c =>
         Description = "API för bokhandel",
         Contact = new OpenApiContact { Name = "Support", Email = "support@ebookstore.com" }
     });
-
-   
 });
 
-// MVC
+// MVC + Auth
 builder.Services.AddControllers();
 builder.Services.AddAuthorization();
 
@@ -57,6 +77,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication(); // ? viktigt att denna kommer före UseAuthorization
 app.UseAuthorization();
 app.MapControllers();
 
