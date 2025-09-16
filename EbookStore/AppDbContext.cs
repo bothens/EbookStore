@@ -1,7 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using EBookStore.Models;
+﻿using System.IO;
+using EFilmStore.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace EBookStore.Data
+namespace EFilmStore.Data
 {
     public class AppDbContext : DbContext
     {
@@ -9,8 +10,7 @@ namespace EBookStore.Data
         {
         }
 
-        public DbSet<Book> Books { get; set; }
-        public DbSet<Author> Authors { get; set; }
-        
+        public DbSet<Film> Films { get; set; }
+        public DbSet<Director> Directors { get; set; }
     }
 }

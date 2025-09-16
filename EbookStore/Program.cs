@@ -1,15 +1,16 @@
-using Microsoft.EntityFrameworkCore;
-using EBookStore.Data;
-using EBookStore.Services;
-using FluentValidation;
-using EBookStore.Mappings;
-using EBookStore.Validators;
-using FluentValidation.AspNetCore;
-using Microsoft.OpenApi.Models;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using EFilmStore.Data;
+using EFilmStore.Mappings;
+using EFilmStore.Services;
+using EFilmStore.Settings;
+using EFilmStore.Validators;
+using System.Text.Json.Serialization;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using EBookStore.Settings;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,14 +22,19 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // FluentValidation
-builder.Services.AddValidatorsFromAssemblyContaining<BookDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<FilmDtoValidator>();
 builder.Services.AddFluentValidationAutoValidation();
 
 // Services
-builder.Services.AddScoped<IBookService, BookService>();
-builder.Services.AddScoped<IAuthorService, AuthorService>();
-builder.Services.AddHttpClient<ExternalBookService>();
-
+builder.Services.AddScoped<IFilmService, FilmService>();
+builder.Services.AddScoped<IDirectorService, DirectorService>();
+builder.Services.AddHttpClient<ExternalFilmService>();
+builder.Services.AddControllers()
+    .AddJsonOptions(o =>
+    {
+        o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        o.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    });
 // JWT Settings
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
@@ -56,10 +62,10 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "EBookStore API",
+        Title = "EFilmStore API",
         Version = "v1",
-        Description = "API för bokhandel",
-        Contact = new OpenApiContact { Name = "Support", Email = "support@ebookstore.com" }
+        Description = "API för filmbutik",
+        Contact = new OpenApiContact { Name = "Support", Email = "support@efilmstore.com" }
     });
 });
 
@@ -73,11 +79,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "EBookStore API v1"));
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "EFilmStore API v1"));
 }
 
 app.UseHttpsRedirection();
-app.UseAuthentication(); // ? viktigt att denna kommer före UseAuthorization
+app.UseAuthentication(); // viktigt att denna kommer före UseAuthorization
 app.UseAuthorization();
 app.MapControllers();
 

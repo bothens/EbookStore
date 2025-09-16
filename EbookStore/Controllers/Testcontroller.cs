@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace EBookStore.Controllers
+namespace EFilmStore.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class TestController : ControllerBase
     {
-        [Authorize] // 
+        [Authorize]
         [HttpGet("secure")]
         public IActionResult GetSecureData()
         {

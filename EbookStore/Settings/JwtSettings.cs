@@ -1,4 +1,4 @@
-﻿namespace EBookStore.Settings
+﻿namespace EFilmStore.Settings
 {
     public class JwtSettings
     {

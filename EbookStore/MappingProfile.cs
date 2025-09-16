@@ -1,19 +1,22 @@
 ﻿using AutoMapper;
-using EBookStore.Models;
-using EBookStore.DTOs;
+using EFilmStore.Models;
+using EFilmStore.DTOs;
 
-namespace EBookStore.Mappings
+namespace EFilmStore.Mappings
 {
     public class MappingProfile : Profile
     {
         public MappingProfile()
         {
-            CreateMap<BookDto, Book>();
-            CreateMap<AuthorDto, Author>();
-        }
-    
- 
-                
-            
+            // DTO -> Entity (fanns redan)
+            CreateMap<FilmDto, Film>();
+            CreateMap<DirectorDto, Director>();
+
+            // Entity -> DTO (behövs för ProjectTo och GET)
+            CreateMap<Film, FilmDto>();
+            CreateMap<Director, DirectorDto>();
         }
     }
+}
+
+

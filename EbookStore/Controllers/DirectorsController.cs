@@ -1,34 +1,35 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using EBookStore.Models;
-using EBookStore.DTOs;
+﻿using System.IO;
 using AutoMapper;
+using EFilmStore.Data;
+using EFilmStore.DTOs;
+using EFilmStore.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using EBookStore.Data;
 
-namespace EBookStore.Controllers
+namespace EFilmStore.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthorsController : ControllerBase
+    public class DirectorsController : ControllerBase
     {
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
 
-        public AuthorsController(AppDbContext context, IMapper mapper)
+        public DirectorsController(AppDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
         [HttpPost]
-        public async Task<ActionResult<Author>> CreateAuthor(AuthorDto authorDto)
+        public async Task<ActionResult<Director>> CreateDirector(DirectorDto directorDto)
         {
             try
             {
-                var author = _mapper.Map<Author>(authorDto);
-                _context.Authors.Add(author);
+                var director = _mapper.Map<Director>(directorDto);
+                _context.Directors.Add(director);
                 await _context.SaveChangesAsync();
-                return Ok(author);
+                return Ok(director);
             }
             catch (Exception ex)
             {
@@ -37,12 +38,12 @@ namespace EBookStore.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Author>>> GetAllAuthors()
+        public async Task<ActionResult<List<Director>>> GetAllDirectors()
         {
             try
             {
-                var authors = await _context.Authors.ToListAsync();
-                return Ok(authors);
+                var directors = await _context.Directors.ToListAsync();
+                return Ok(directors);
             }
             catch (Exception ex)
             {

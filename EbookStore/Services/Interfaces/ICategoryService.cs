@@ -1,8 +1,8 @@
-﻿using EBookStore.DTOs;
+﻿using EFilmStore.DTOs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace EBookStore.Services
+namespace EFilmStore.Services
 {
     
 }

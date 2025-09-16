@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace EBookStore.Models
+namespace EFilmStore.Models
 {
-    public class Author
+    public class Director
     {
-        public int AuthorId { get; set; }
+        public int DirectorId { get; set; }
 
         [Required]
         public string Name { get; set; }
 
         // Navigation property
-        public List<Book> Books { get; set; } = new List<Book>();
+        public List<Film> Films { get; set; } = new List<Film>();
     }
 }
